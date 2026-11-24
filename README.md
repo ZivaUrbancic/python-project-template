@@ -1,31 +1,281 @@
-# Python + R Project Template
+# Python Project Template
 
-A reproducible project environment for Python and R, managed with **Micromamba** and **direnv**, and designed for use with **Visual Studio Code** and **Jupyter Notebooks**.
+A reproducible Python project environment using **Micromamba**, **direnv**, **Visual Studio Code**, and **Jupyter**.
 
-This template provides an isolated environment for each project. Python and R, their packages, language servers, Jupyter kernels, and development tools are installed in the project environment rather than the system installation.
+This template provides an isolated environment for each project, with automatic activation and a consistent development setup.
 
-The goal is to make projects easy to reproduce on another computer, including an office computer.
+The goal is to make projects easy to create, maintain, and reproduce on another computer.
 
----
-
-## 1. Features
+## 1. What's included?
 
 - Python 3.12
-- R 4.5
-- Isolated project-specific Micromamba environment
-- Automatic environment activation with `direnv`
-- Python development with VS Code and Pylance
-- R development with VS Code and the R extension
-- Python and R Jupyter kernels
+- Project-specific Micromamba environment
+- Automatic environment activation with direnv
+- NumPy, pandas, and Matplotlib
+- Jupyter Notebook support
 - Python linting and formatting with Ruff
-- R formatting with Styler
-- R language support through `languageserver`
-- Shared VS Code project settings
-- Reproducible package installation through `environment.yml`
+- VS Code project settings
+- Reproducible dependency installation through `environment.yml`
+
+## 2. Create a new project
+
+### 2.1 Create a repository from this template
+
+On GitHub:
+
+1. Open this template repository.
+2. Click **Use this template → Create a new repository**.
+3. Choose a name for your new project.
+4. Choose the repository visibility.
+5. Create the repository.
+
+### 2.2 Clone the repository
+
+Open a terminal:
+
+```bash
+cd ~/Projects
+git clone <REPOSITORY_URL>
+cd <PROJECT_NAME>
+```
+
+Replace `<REPOSITORY_URL>` with your new repository's URL.
+
+### 2.3 Create the project environment
+
+The dependencies are defined in `environment.yml`.
+
+Create a Micromamba environment named after the project directory:
+
+```bash
+micromamba create -f environment.yml -n "$(basename "$PWD")"
+```
+
+This installs Python and all packages specified in the environment definition.
+
+### 2.4 Enable automatic environment activation
+
+The project contains a `.envrc` file that configures automatic activation.
+
+Allow direnv to load it:
+
+```bash
+direnv allow
+```
+
+Whenever you enter the project directory, direnv automatically activates the corresponding Micromamba environment.
+
+When you leave the directory, the environment is deactivated.
+
+Verify the active environment:
+
+```bash
+echo "$CONDA_DEFAULT_ENV"
+```
+
+Check the Python executable:
+
+```bash
+which python
+```
+
+It should point to:
+
+```text
+~/micromamba/envs/<PROJECT_NAME>/bin/python
+```
+
+### 2.5 Open the project in VS Code
+
+```bash
+code .
+```
+
+VS Code should detect the Python environment.
+
+If necessary:
+
+1. Open the Command Palette.
+2. Select **Python: Select Interpreter**.
+3. Choose the interpreter inside the project environment:
+
+```text
+~/micromamba/envs/<PROJECT_NAME>/bin/python
+```
+
+## 3. Python development
+
+### 3.1 Project structure
+
+A typical project can follow this structure:
+
+```text
+PROJECT_NAME/
+│
+├── .git/
+├── .vscode/
+│   └── settings.json
+│
+├── .envrc
+├── .gitignore
+├── environment.yml
+├── README.md
+│
+├── data/
+├── notebooks/
+├── scripts/
+└── results/
+```
+
+The `data`, `notebooks`, `scripts`, and `results` directories are optional and can be created as needed.
+
+### 3.2 Python scripts
+
+Create Python scripts in the project directory or in `scripts/`.
+
+For example:
+
+```text
+scripts/
+└── analysis.py
+```
+
+Run a script from the activated project environment:
+
+```bash
+python scripts/analysis.py
+```
+
+### 3.3 Jupyter Notebooks
+
+The environment includes `ipykernel`.
+
+VS Code should be able to discover the project environment as a Jupyter kernel.
+
+If necessary, register it manually:
+
+```bash
+python -m ipykernel install --user \
+  --name "$(basename "$PWD")" \
+  --display-name "Python ($(basename "$PWD"))"
+```
+
+Open a notebook (`.ipynb`) in VS Code and select the corresponding Python kernel.
+
+### 3.4 Code formatting and linting with Ruff
+
+Ruff is used for Python code quality and formatting.
+
+The shared VS Code settings enable:
+
+- Formatting on save
+- Ruff linting
+- Ruff formatting
+- Ruff quick fixes
+
+You can also run Ruff manually.
+
+Check for linting issues:
+
+```bash
+ruff check .
+```
+
+Format Python files:
+
+```bash
+ruff format .
+```
+
+## 4. Managing dependencies
+
+The file `environment.yml` is the central record of the project's dependencies.
+
+Whenever you add a package, update this file so the environment can be reproduced on another computer.
+
+For example, add a Python package under `dependencies`:
+
+```yaml
+dependencies:
+  - python=3.12
+  - pip
+  - ipykernel
+  - numpy
+  - pandas
+  - matplotlib
+  - ruff
+  - scipy
+```
+
+Update the existing environment:
+
+```bash
+micromamba env update -f environment.yml -n "$(basename "$PWD")"
+```
+
+If you need to recreate the environment from scratch:
+
+```bash
+micromamba env remove -n "$(basename "$PWD")"
+micromamba create -f environment.yml -n "$(basename "$PWD")"
+```
+
+After recreating it, select the interpreter and Jupyter kernel again in VS Code if necessary.
+
+## 5. Daily workflow
+
+### Starting work
+
+Enter the project directory:
+
+```bash
+cd ~/Projects/<PROJECT_NAME>
+```
+
+The environment activates automatically.
+
+Open VS Code:
+
+```bash
+code .
+```
+
+### Working with Python
+
+Use the activated environment to run scripts, work with notebooks, and install or manage dependencies.
+
+### Leaving the project
+
+Simply leave the directory:
+
+```bash
+cd ..
+```
+
+direnv automatically deactivates the project environment.
+
+## 6. Git and version control
+
+The project uses Git for version control.
+
+The `.gitignore` file excludes temporary and local development files, including:
+
+- Python cache files
+- Ruff cache
+- Jupyter checkpoints
+- Operating-system metadata
+
+The Micromamba environment itself is not stored in Git. Instead, `environment.yml` records the dependencies needed to recreate it.
+
+Commit changes to `environment.yml` whenever project dependencies are modified.
 
 ---
 
-## 2. Prerequisites
+# 7. Installing prerequisites on a new computer
+
+The following instructions describe how to prepare a new Ubuntu computer to use this template.
+
+## 7.1 System requirements
 
 The setup assumes:
 
@@ -36,28 +286,30 @@ The setup assumes:
 - direnv
 - Visual Studio Code
 
-The instructions below describe how to prepare a new Ubuntu computer.
+## 7.2 Install basic utilities and Git
 
----
-
-## 3. Install the required software
-
-### 3.1 Update Ubuntu
+Update Ubuntu:
 
 ```bash
 sudo apt update
 sudo apt upgrade
 ```
 
-Install Git and other basic utilities:
+Install Git and basic utilities:
 
 ```bash
 sudo apt install git curl wget unzip build-essential
 ```
 
-### 3.2 Install Micromamba
+Verify Git:
 
-Download and install Micromamba:
+```bash
+git --version
+```
+
+## 7.3 Install Micromamba
+
+Install Micromamba:
 
 ```bash
 "${SHELL}" <(curl -L micro.mamba.pm/install.sh)
@@ -65,7 +317,7 @@ Download and install Micromamba:
 
 Restart the terminal or reload the Bash configuration.
 
-Check the installation:
+Verify:
 
 ```bash
 micromamba --version
@@ -77,13 +329,13 @@ Configure the Micromamba root directory:
 micromamba config set root_prefix ~/micromamba
 ```
 
-Configure the environment directory:
+Create the environment directory:
 
 ```bash
 mkdir -p ~/micromamba/envs
 ```
 
-Use conda-forge as the package channel:
+Configure conda-forge as the package channel:
 
 ```bash
 micromamba config append channels conda-forge
@@ -104,7 +356,7 @@ micromamba shell init --shell bash --root-prefix ~/micromamba
 
 Restart the terminal.
 
-### 3.3 Install direnv
+## 7.4 Install direnv
 
 Install direnv:
 
@@ -118,7 +370,7 @@ Add the Bash hook to `~/.bashrc`:
 echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
 ```
 
-Add the Micromamba environment directory:
+Configure the Micromamba environment directory:
 
 ```bash
 echo 'export MAMBA_ENVS_DIR="$HOME/micromamba/envs"' >> ~/.bashrc
@@ -137,459 +389,48 @@ direnv version
 echo "$MAMBA_ENVS_DIR"
 ```
 
-### 3.4 Install Visual Studio Code
+## 7.5 Install Visual Studio Code
 
 Install Visual Studio Code using the preferred installation method for your Ubuntu system.
 
-Verify that it is available:
+Verify:
 
 ```bash
 code --version
 ```
 
----
+## 7.6 Install VS Code extensions
 
-## 4. VS Code extensions
+The following extensions are recommended.
 
-Install the following extensions.
-
-### Python development
+**Python development:**
 
 - Python (`ms-python.python`)
 - Pylance (`ms-python.vscode-pylance`)
 - Jupyter (`ms-toolsai.jupyter`)
 - Ruff (`charliermarsh.ruff`)
 
-### R development
+They can be installed through the VS Code Extensions panel.
 
-- R (`REditorSupport.r`)
+## 8. Reproducing a project on another computer
 
-### Remote development (optional)
-
-- Remote - SSH (`ms-vscode-remote.remote-ssh`)
-
-The extensions can be installed through the VS Code Extensions panel.
-
----
-
-## 5. Create a new project
-
-### 5.1 Create a project from this GitHub template
-
-On GitHub:
-
-1. Open this template repository.
-2. Select **Use this template**.
-3. Create a new repository for your project.
-4. Clone the new repository:
-
-```bash
-mkdir -p ~/Projects
-cd ~/Projects
-git clone <REPOSITORY_URL>
-```
-
-Enter the project directory:
-
-```bash
-cd <PROJECT_NAME>
-```
-
-### 5.2 Create the Micromamba environment
-
-The environment is defined in `environment.yml`.
-
-Create an environment named after the project directory:
-
-```bash
-micromamba create -f environment.yml -n "$(basename "$PWD")"
-```
-
-This installs Python, R, and the packages specified in the environment definition.
-
-### 5.3 Configure automatic activation
-
-The `.envrc` file contains the project-specific environment activation instructions.
-
-Allow direnv to load it:
-
-```bash
-direnv allow
-```
-
-Whenever you enter the project directory, direnv automatically activates the corresponding Micromamba environment.
-
-When you leave the directory, the environment is deactivated.
-
-Verify the active environment:
-
-```bash
-echo "$CONDA_DEFAULT_ENV"
-```
-
-Verify the Python and R executables:
-
-```bash
-which python
-which R
-```
-
-Both should point to the project's Micromamba environment.
-
----
-
-## 6. Python setup
-
-### 6.1 Select the Python interpreter
-
-Open the project directory in VS Code:
-
-```bash
-code .
-```
-
-Use the Command Palette:
-
-1. Select **Python: Select Interpreter**.
-2. Choose the Python interpreter inside the project environment.
-
-It should be located at:
-
-```text
-~/micromamba/envs/<PROJECT_NAME>/bin/python
-```
-
-### 6.2 Jupyter Notebook
-
-The environment includes `ipykernel`.
-
-VS Code should be able to discover the Python environment as a Jupyter kernel.
-
-If necessary, register it manually:
-
-```bash
-python -m ipykernel install --user \
-  --name "$(basename "$PWD")" \
-  --display-name "Python ($(basename "$PWD"))"
-```
-
-When opening a notebook, select the corresponding Python kernel.
-
-### 6.3 Ruff: linting and formatting
-
-Ruff is used for Python code quality and formatting.
-
-The project settings enable:
-
-- Automatic formatting on save
-- Ruff linting
-- Ruff formatting
-- Ruff quick fixes
-
-You can also run Ruff manually:
-
-```bash
-ruff check .
-```
-
-Format Python files:
-
-```bash
-ruff format .
-```
-
----
-
-## 7. R setup
-
-### 7.1 R interpreter
-
-R is installed inside the project environment.
-
-Verify the installation:
-
-```bash
-R --version
-```
-
-In VS Code, the R extension should detect the R executable through the activated project environment.
-
-To open an R terminal:
-
-1. Open the Command Palette.
-2. Select **R: Create R Terminal**.
-
-Verify the R installation:
-
-```r
-R.home()
-R.version.string
-```
-
-The R home directory should point to the project environment.
-
-### 7.2 R language server
-
-The environment includes `languageserver`.
-
-This provides language support such as:
-
-- Code completion
-- Diagnostics
-- Navigation
-- Hover information
-
-The VS Code R extension uses this package for language-server functionality.
-
-### 7.3 R formatting with Styler
-
-The environment includes `styler`.
-
-You can format an R script manually:
-
-```r
-styler::style_file("script.R")
-```
-
-### 7.4 R Jupyter kernel
-
-The environment includes `IRkernel`.
-
-Register the R kernel for the current user:
-
-```bash
-Rscript -e "IRkernel::installspec(user=TRUE, name='$(basename "$PWD")-r', displayname='R ($(basename "$PWD"))')"
-```
-
-After registration, select the corresponding R kernel when opening an R notebook in VS Code.
-
-The kernel registration is user-specific and must be performed separately on each computer.
-
-### 7.5 R graphics configuration
-
-The project includes a `.Rprofile` file.
-
-It configures the graphics device to use a white background in Jupyter:
-
-```r
-setHook(
-  packageEvent("grDevices", "onLoad"),
-  function(...) {
-    grDevices::pdf.options(bg = "white")
-  }
-)
-```
-
-This helps avoid black backgrounds in exported or displayed notebook plots.
-
----
-
-## 8. Daily workflow
-
-### Starting work
-
-Open a terminal and enter the project directory:
-
-```bash
-cd ~/Projects/<PROJECT_NAME>
-```
-
-The environment should activate automatically.
-
-Open VS Code:
-
-```bash
-code .
-```
-
-### Python
-
-Create Python scripts:
-
-```text
-script.py
-```
-
-Create Jupyter notebooks:
-
-```text
-notebook.ipynb
-```
-
-### R
-
-Create R scripts:
-
-```text
-script.R
-```
-
-Create R notebooks:
-
-```text
-notebook.ipynb
-```
-
-Select the appropriate Python or R kernel for each notebook.
-
-### Leaving the project
-
-Simply leave the project directory:
-
-```bash
-cd ..
-```
-
-direnv automatically deactivates the project environment.
-
----
-
-## 9. Updating dependencies
-
-The file `environment.yml` is the central record of the project's dependencies.
-
-When adding a package, update this file so the environment can be reproduced on another computer.
-
-For example, add a Python package under the Python dependencies or an R package under the R dependencies.
-
-After modifying the file, update the environment:
-
-```bash
-micromamba env update -f environment.yml -n "$(basename "$PWD")"
-```
-
-If the environment needs to be recreated from scratch:
-
-```bash
-micromamba env remove -n "$(basename "$PWD")"
-micromamba create -f environment.yml -n "$(basename "$PWD")"
-```
-
-After recreating the environment, register the R Jupyter kernel again:
-
-```bash
-Rscript -e "IRkernel::installspec(user=TRUE, name='$(basename "$PWD")-r', displayname='R ($(basename "$PWD"))')"
-```
-
----
-
-## 10. Git and version control
-
-The project uses Git for version control.
-
-The `.gitignore` file excludes temporary files and local development artifacts, including:
-
-- Python cache files
-- Ruff cache
-- R history and workspace files
-- Jupyter checkpoints
-- Operating-system metadata
-
-The environment itself is not stored in Git. Instead, `environment.yml` records the dependencies needed to recreate it.
-
-Commit changes to the project configuration whenever dependencies or shared settings are modified.
-
----
-
-## 11. Troubleshooting
-
-### Environment does not activate
-
-Run:
-
-```bash
-direnv allow
-```
-
-Check that the `.envrc` file exists and that direnv is initialized in Bash.
-
-### Python or R points to the system installation
-
-Check:
-
-```bash
-echo "$CONDA_DEFAULT_ENV"
-which python
-which R
-```
-
-If necessary, leave the project directory and enter it again.
-
-### VS Code does not detect Python
-
-Use **Python: Select Interpreter** and manually select:
-
-```text
-~/micromamba/envs/<PROJECT_NAME>/bin/python
-```
-
-### VS Code does not detect R
-
-Verify that the environment is active and that R is available:
-
-```bash
-which R
-R --version
-```
-
-Then reload the VS Code window.
-
-### R kernel is missing
-
-Register it again:
-
-```bash
-Rscript -e "IRkernel::installspec(user=TRUE, name='$(basename "$PWD")-r', displayname='R ($(basename "$PWD"))')"
-```
-
-### Dependencies are missing
-
-Update the environment:
-
-```bash
-micromamba env update -f environment.yml -n "$(basename "$PWD")"
-```
-
----
-
-## 12. Project structure
-
-A typical project created from this template has the following structure:
-
-```text
-PROJECT_NAME/
-│
-├── .git/
-├── .vscode/
-│   └── settings.json
-│
-├── .envrc
-├── .gitignore
-├── .Rprofile
-├── environment.yml
-├── README.md
-│
-├── data/
-├── notebooks/
-├── scripts/
-└── results/
-```
-
-The `data`, `notebooks`, `scripts`, and `results` directories can be created as needed.
-
----
-
-## 13. Reproducibility
-
-To reproduce the project on another Ubuntu computer:
+To reproduce a project on another Ubuntu computer:
 
 1. Install Git, Micromamba, direnv, and VS Code.
 2. Configure Bash as described above.
 3. Clone the project repository.
-4. Create the environment using `environment.yml`.
-5. Run `direnv allow`.
-6. Open the project in VS Code.
-7. Register the R Jupyter kernel.
-8. Select the appropriate Python or R interpreter and notebook kernel.
+4. Enter the project directory.
+5. Create the environment using `environment.yml`.
+6. Run `direnv allow`.
+7. Open the project in VS Code.
+8. Select the Python interpreter and Jupyter kernel if necessary.
 
-This recreates the project's software environment without requiring a copy of the original computer's installed packages.
+The project environment can then be recreated without copying the original computer's installed packages.
+
+---
+
+**Environment management:** Micromamba  
+**Automatic activation:** direnv  
+**Editor:** Visual Studio Code  
+**Notebook support:** Jupyter  
+**Linting and formatting:** Ruff

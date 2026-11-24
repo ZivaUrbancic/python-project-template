@@ -1,7 +1,5 @@
 {
     "python-envs.defaultEnvManager": "ms-python.python:system",
-    "r.lsp.enabled": true,
-    "r.lsp.debug": false,
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff",
         "editor.formatOnSave": true
@@ -10,9 +8,5 @@
     "ruff.format.enable": true,
     "editor.codeActionsOnSave": {
         "source.fixAll.ruff": "explicit"
-    },
-    "[r]": {
-        "editor.defaultFormatter": "REditorSupport.r",
-        "editor.formatOnSave": true
     }
 }
